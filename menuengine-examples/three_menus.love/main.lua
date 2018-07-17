@@ -79,16 +79,20 @@ end
 
 function menu_main()
     MODE = 0
+	mainmenu.cursor = 1  -- reset Selection to the first Entry
 end
 
 function menu_one()
     MODE = 1
+	menu_one.cursor = 1
 end
 
 function menu_two()
     MODE = 2
+	menu_two.cursor = 1
 end
 
 function menu_three()
     MODE = 3
+	menu_three.cursor = 1
 end
