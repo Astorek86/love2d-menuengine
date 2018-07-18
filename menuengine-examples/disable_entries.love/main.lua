@@ -6,7 +6,7 @@ function love.load()
 
     mainmenu = menuengine.new(200,100)
     entry_one = mainmenu:addEntry("Hide me", hide_first_entry)
-    mainmenu:addEntry("Hide me too", hide_first_entry)
+    entry_two = mainmenu:addEntry("Hide me too", hide_second_entry)
     mainmenu:addEntry("show first Entry if hidden", show_first_entry)
     mainmenu:addEntry("show all Entries if hidden", show_all_entries)
 end
@@ -38,6 +38,10 @@ end
 
 function hide_first_entry()
     entry_one.disabled = true
+end
+
+function hide_second_entry()
+    entry_two.disabled = true
 end
 
 function show_first_entry()
