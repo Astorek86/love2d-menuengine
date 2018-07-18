@@ -1,5 +1,5 @@
 menuengine = {}
-menuengine.VERSION = "0.9.9b Beta"
+menuengine.VERSION = "0.9.9c Beta"
 
 
 -- Defaults
@@ -220,12 +220,12 @@ function menuengine.new(x, y, font, space)
                       menuengine.mouse_x > self.entries[i].x and menuengine.mouse_x < self.entries[i].x + self.entries[i].font:getWidth(self.entries[i].text..self.normalSelectedBegin..self.normalSelectedEnd..self.symbolSelectedEnd) then
                         if self.cursor ~= i then
                             self.cursor = i
-                            if self.entries[i].sndMove ~= nil then
+                            if not self.entries[i].disabled and self.entries[i].sndMove ~= nil then
                                 self.entries[i].sndMove:stop()
                                 self.entries[i].sndMove:play()
                             end
                         end
-                        if love.mouse.isDown(1) and not menuengine.clicked then
+                        if not self.entries[i].disabled and love.mouse.isDown(1) and not menuengine.clicked then
                             self:_finish()
                             menuengine.clicked = true
                         -- prevent Clicking by every Frame
