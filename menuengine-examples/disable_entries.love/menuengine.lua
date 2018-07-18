@@ -216,7 +216,7 @@ function menuengine.new(x, y, font, space)
             if not self.mouseDisabled then
 
                 for i=1,#self.entries do
-                    if menuengine.mouse_y > self.entries[i].y and menuengine.mouse_y < self.entries[i].y + self.space and #self.entries[i].text > 0 and
+                    if not self.entries[i].disabled and menuengine.mouse_y > self.entries[i].y and menuengine.mouse_y < self.entries[i].y + self.space and #self.entries[i].text > 0 and
                       menuengine.mouse_x > self.entries[i].x and menuengine.mouse_x < self.entries[i].x + self.entries[i].font:getWidth(self.entries[i].text..self.normalSelectedBegin..self.normalSelectedEnd..self.symbolSelectedEnd) then
                         if self.cursor ~= i then
                             self.cursor = i
@@ -242,13 +242,15 @@ function menuengine.new(x, y, font, space)
 
     -- This function should probably NOT be called from the "outside".
     function self:_finish()
-        self.entries[self.cursor].func()
-        if self.entries[self.cursor].sndSuccess ~= nil then
-            self.entries[self.cursor].sndSuccess:stop()
-            self.entries[self.cursor].sndSuccess:play()
-        end
-        if self.target ~= nil then
-            self.target(self.cursor)
+        if not self.entries[self.cursor].disabled then
+            self.entries[self.cursor].func()
+            if self.entries[self.cursor].sndSuccess ~= nil then
+                self.entries[self.cursor].sndSuccess:stop()
+                self.entries[self.cursor].sndSuccess:play()
+            end
+            if self.target ~= nil then
+                self.target(self.cursor)
+            end
         end
     end
 
