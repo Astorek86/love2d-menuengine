@@ -1,5 +1,5 @@
 menuengine = {}
-menuengine.VERSION = "0.9.9a Beta"
+menuengine.VERSION = "0.9.9b Beta"
 
 
 -- Defaults
@@ -149,7 +149,7 @@ function menuengine.new(x, y, font, space)
     -- Disable this Menu; "draw" and "update" will have no effects.
     function self:setDisabled(value)
         local i
-        for i=1,#self.eintries do
+        for i=1,#self.entries do
             self.entries[i].disabled = value
         end
         self.disabled = value
@@ -164,7 +164,7 @@ function menuengine.new(x, y, font, space)
     function self:mouseDisable()
         self.mouseDisabled = true
     end
-    
+
     function self:setColorNormal(color)
         local i
         for i=1,#self.entries do
@@ -172,7 +172,7 @@ function menuengine.new(x, y, font, space)
         end
         self.colorNormal = color
     end
-    
+
     function self:setColorSelected(color)
         local i
         for i=1,#self.entries do
@@ -251,7 +251,7 @@ function menuengine.new(x, y, font, space)
             self.target(self.cursor)
         end
     end
-    
+
     function self:setSndMove(snd)
         local i
         for i=1,#self.entries do
@@ -267,7 +267,7 @@ function menuengine.new(x, y, font, space)
         end
         self.sndSuccess = snd
     end
-    
+
     self:setFont(font, space)
     table.insert(menus, self)
     return self
