@@ -1,4 +1,8 @@
+
 local menuengine = require "menuengine"
+menuengine.settings.sndMove = love.audio.newSource("pick.wav", "static")
+menuengine.settings.sndSuccess = love.audio.newSource("accept.wav", "static")
+
 
 local text = "Nothing was selected."
 
