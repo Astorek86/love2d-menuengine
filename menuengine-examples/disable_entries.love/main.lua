@@ -1,5 +1,35 @@
-require "menuengine"
+local menuengine = require "menuengine"
 
+
+-- Mainmenu
+local mainmenu
+
+-- Entries
+local entry_one, entry_two, entry_four
+
+
+-- Functions to hide Entries
+local function hide_first_entry()
+    entry_one.disabled = true
+end
+
+local function hide_second_entry()
+    entry_two.disabled = true
+end
+
+local function hide_fourth_entry()
+    entry_four.disabled = true
+end
+
+local function show_first_entry()
+    entry_one.disabled = false
+end
+
+local function show_all_entries()
+    mainmenu:setDisabled(false)
+end
+
+ -- ----------
 
 function love.load()
     love.window.setMode(600,400)
@@ -39,24 +69,4 @@ end
 
 function love.mousemoved(x, y, dx, dy, istouch)
     menuengine.mousemoved(x, y)
-end
-
-function hide_first_entry()
-    entry_one.disabled = true
-end
-
-function hide_second_entry()
-    entry_two.disabled = true
-end
-
-function hide_fourth_entry()
-    entry_four.disabled = true
-end
-
-function show_first_entry()
-    entry_one.disabled = false
-end
-
-function show_all_entries()
-    mainmenu:setDisabled(false)
 end

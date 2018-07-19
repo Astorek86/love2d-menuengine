@@ -1,5 +1,5 @@
-menuengine = {}
-menuengine.VERSION = "0.9.9c Beta"
+local menuengine = {}
+menuengine.VERSION = "0.9.9d Beta"
 
 
 -- Defaults
@@ -42,6 +42,10 @@ menuengine.mouse_y = 0
 menuengine.clicked = false
 
 
+-- Error-Handling if nil-Function is there
+menuengine.stop_on_nil_functions = false
+
+
 -- Constructor
 function menuengine.new(x, y, font, space)
     local self = {}
@@ -67,25 +71,33 @@ function menuengine.new(x, y, font, space)
 
     -- Add Entry
     function self:addEntry(text, func, font, colorNormal, colorSelected)
-        self.entries[#self.entries+1] = {}
-        self.entries[#self.entries].text = text
-        self.entries[#self.entries].x = x
-        self.entries[#self.entries].y = y + (#self.entries-1) * self.space
-        self.entries[#self.entries].font = font or self.font
-        self.entries[#self.entries].func = func or function()end
-        self.entries[#self.entries].colorNormal = colorNormal or self.colorNormal
-        self.entries[#self.entries].colorSelected = colorSelected or self.colorSelected
+        if menuengine.stop_on_nil_functions and func == nil and self.target == nil then
+            error("menuengine: nil is not a function")
+            --[[
+                Maybe a Typo-Error? I think it's more useful to throw an
+                Error and NOT continuing, like, there's nothing wrong about that...
+            --]]
+        else
+            self.entries[#self.entries+1] = {}
+            self.entries[#self.entries].text = text
+            self.entries[#self.entries].x = x
+            self.entries[#self.entries].y = y + (#self.entries-1) * self.space
+            self.entries[#self.entries].font = font or self.font
+            self.entries[#self.entries].func = func or function()end
+            self.entries[#self.entries].colorNormal = colorNormal or self.colorNormal
+            self.entries[#self.entries].colorSelected = colorSelected or self.colorSelected
 
-        -- Other Options
-        self.entries[#self.entries].symbolSelectedBegin = self.symbolSelectedBegin
-        self.entries[#self.entries].symbolSelectedEnd = self.symbolSelectedEnd
-        self.entries[#self.entries].normalSelectedBegin = self.normalSelectedBegin
-        self.entries[#self.entries].normalSelectedEnd = self.normalSelectedEnd
-        self.entries[#self.entries].sndMove = self.sndMove
-        self.entries[#self.entries].sndSuccess = self.sndSuccess
-        self.entries[#self.entries].disabled = self.disabled
+            -- Other Options
+            self.entries[#self.entries].symbolSelectedBegin = self.symbolSelectedBegin
+            self.entries[#self.entries].symbolSelectedEnd = self.symbolSelectedEnd
+            self.entries[#self.entries].normalSelectedBegin = self.normalSelectedBegin
+            self.entries[#self.entries].normalSelectedEnd = self.normalSelectedEnd
+            self.entries[#self.entries].sndMove = self.sndMove
+            self.entries[#self.entries].sndSuccess = self.sndSuccess
+            self.entries[#self.entries].disabled = self.disabled
 
-        return self.entries[#self.entries]
+            return self.entries[#self.entries]
+        end
     end
 
     -- Move Position
@@ -143,7 +155,7 @@ function menuengine.new(x, y, font, space)
 
     -- Add Separator
     function self:addSep()
-        self:addEntry("")
+        return self:addEntry("", function()end)
     end
 
     -- Disable this Menu; "draw" and "update" will have no effects.
@@ -360,3 +372,6 @@ function menuengine.mouseDisable()
         menus[i]:mouseDisable()
     end
 end
+
+
+return menuengine

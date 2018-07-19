@@ -37,6 +37,8 @@ Displayed Text. Required.
 `func`
 Function that will be called, if the User selects this Menupoint. If set to **nil**, nothing will happend (except you set the menu:__target__ to a function (see below, "Example 2")). Optional.
 
+> If you set `menuengine.stop_on_nil_functions = true`, a **nil**-Function will throw an Error.
+
 `font`
 Selected Font-Object for this Entry. Optional.
 
@@ -51,7 +53,7 @@ Just write
 ```Lua
 menu:addSep()
 ```
-Returns nothing, no Parameters.
+Returns an **entry**-object. No Parameters.
 ___
 ## `Entry`-Objects
 **entry**-Objects (created through __addEntry__ from a `menu`-Object) have only attributes, no methods.
@@ -71,7 +73,7 @@ function as callable Function. **nil** if not configured.
 `symbolSelectedBegin`, `symbolSelectedEnd`, `normalSelectedBegin`, `normalSelectedEnd`
 Strings to add on Begin/End of the Text ("symbol..." if selected, "normal..." if not selected).
 
-For Example, if "text" is "Menuentry", "symbolSelectedBegin" is = "[" and "symbolSelectedEnd" is "]", than it will show up as "[Menuentry]" if it's selected by the User.
+For Example, if "text" is "Menuentry", "symbolSelectedBegin" is "[" and "symbolSelectedEnd" is "]", than it will show up as "[Menuentry]" if it's selected by the User.
 
 `sndMove`, `sndSuccess`
 Sounds that will be played if User selects this Entry.
@@ -121,7 +123,7 @@ ___
 ```Lua
 menu:setDisabled(value)
 ```
-Disables every Entry. Draw- and Update-States will have no effects, and Entries won't shown as long as they are disabled.
+Enables or Disables every Entry. Draw- and Update-States will have no effects if disabled, and Entries won't shown as long as they are disabled.
 
 `value`
 Boolean. Required.
@@ -148,7 +150,7 @@ menu:moveCursor(d)
 Moves the Cursor in the given Direction.
 
 `d`
-Integer. Direction; "-1" means "up", "1" means "down".
+Integer. Direction; **-1** means "up", **1** means "down".
 ___
 ```Lua
 menu:setSndMove(sound)
@@ -161,7 +163,7 @@ ___
 ```Lua
 menu:setSndSuccess(sound)
 ```
-Set the Sound of every Entry that will be played if the User moves through the Entries.
+Set the Sound of every Entry that will be played if the User selects an Entry.
 
 `sound`
 Sound-Object. If **nil**, no sound will be played.
@@ -174,96 +176,59 @@ Defaults to **nil**. If set, it will called as a Function after the User selects
 
 `menu.cursor`
 Integer. Represent actual Cursor-Position.
-==Be very careful of setting this Variable. It is useful for setting the Cursor in a Pre-defined Value (for example, "1" is always the first Entry), but it will not check on Errors. As say, be very careful with that Attribute!==
+
+> Be very careful of setting this Variable. It is useful for setting the Cursor in a Pre-defined Value (for example, **1** is always the first Entry), but it will not check on Errors! As say, be very careful with that Attribute!
+
 ___
 # Examples
 ___
 ## Example 1
 ```Lua
-require "menuengine"
+local menuengine = require "menuengine"
+menuengine.stop_on_nil_functions = true
+
+local text = "Nothing was selected."
+
+-- Mainmenu
+local mainmenu
+
+-- Start Game
+local function start_game()
+    text = "Start Game was selected!"
+end
+
+-- Options
+local function options()
+    text = "Options was selected!"
+end
+
+-- Quit Game
+local function quit_game()
+    text = "Quit Game was selected!"
+end
+
+ -- ----------
+
 function love.load()
-    text = "Nothing was selected."
-    
     love.window.setMode(600,400)
     love.graphics.setFont(love.graphics.newFont(20))
+
     mainmenu = menuengine.new(200,100)
     mainmenu:addEntry("Start Game", start_game)
     mainmenu:addEntry("Options", options)
     mainmenu:addSep()
     mainmenu:addEntry("Quit Game", quit_game)
 end
-function love.update(dt)
-    mainmenu:update()
-end
-
-function love.draw()
-    love.graphics.clear()
-    love.graphics.print(text)
-    mainmenu:draw()  -- required
-end
-
-function love.keypressed(key, scancode, isrepeat)
-    menuengine.keypressed(scancode)  -- required
-    
-    if scancode == "escape" then
-        love.event.quit()
-    end
-end
-
--- required to check Mouse-Input
-function love.mousemoved(x, y, dx, dy, istouch)
-    menuengine.mousemoved(x, y)
-end
-
-
--- Start Game
-function start_game()
-    text = "Start Game was selected!"
-end
-
--- Options
-function options()
-    text = "Options was selected!"
-end
-
-
--- Quit Game
-function quit_game()
-    text = "Quit Game was selected!"
-end
-```
-___
-### Example 2
-Example with **target**-Usage.
-```Lua
-require "menuengine"
-
-function love.load()
-    text = "Nothing was selected."
-
-    love.window.setMode(600,400)
-    love.graphics.setFont(love.graphics.newFont(20))
-
-    mainmenu = menuengine.new(200,100)
-    mainmenu:addEntry("Start Game")
-    mainmenu:addEntry("Options")
-    mainmenu:addSep()
-    mainmenu:addEntry("Quit Game")
-    mainmenu.target = mainmenu_finish  -- enable Target-Mode.
-end
-
 
 function love.update(dt)
     mainmenu:update()
 end
-
 
 function love.draw()
     love.graphics.clear()
     love.graphics.print(text)
     mainmenu:draw()
 end
-
 
 function love.keypressed(key, scancode, isrepeat)
     menuengine.keypressed(scancode)
@@ -273,14 +238,24 @@ function love.keypressed(key, scancode, isrepeat)
     end
 end
 
-
 function love.mousemoved(x, y, dx, dy, istouch)
     menuengine.mousemoved(x, y)
 end
+```
+___
+### Example 2
+Example with **target**-Usage.
+```Lua
+local menuengine = require "menuengine"
+menuengine.stop_on_nil_functions = true
 
+local text = "Nothing was selected."
 
--- Start Game
-function mainmenu_finish(entrypoint)
+-- Mainmenu
+local mainmenu
+
+-- Function to start after User selects something
+local function mainmenu_finish(entrypoint)
     if entrypoint == 1 then
         text = "Start Game was selected!"
     elseif entrypoint == 2 then
@@ -289,30 +264,69 @@ function mainmenu_finish(entrypoint)
         text = "Quit Game was selected!"
     end
 end
+
+ -- ----------
+
+function love.load()
+    love.window.setMode(600,400)
+    love.graphics.setFont(love.graphics.newFont(20))
+
+    mainmenu = menuengine.new(200,100)
+    mainmenu.target = mainmenu_finish  -- enable Target-Mode.
+    mainmenu:addEntry("Start Game")
+    mainmenu:addEntry("Options")
+    mainmenu:addSep()
+    mainmenu:addEntry("Quit Game")
+end
+
+function love.update(dt)
+    mainmenu:update()
+end
+
+function love.draw()
+    love.graphics.clear()
+    love.graphics.print(text)
+    mainmenu:draw()
+end
+
+function love.keypressed(key, scancode, isrepeat)
+    menuengine.keypressed(scancode)
+
+    if scancode == "escape" then
+        love.event.quit()
+    end
+end
+
+function love.mousemoved(x, y, dx, dy, istouch)
+    menuengine.mousemoved(x, y)
+end
 ```
 ___
 ### Example 3
 Example using **love.graphics.scale**. You need to scale Mouse-Coordinates before calling **menuengine.mousemoved**.
 ```Lua
-require "menuengine"
+local menuengine = require "menuengine"
+
+-- store Resolutions
+local INTERNAL_RES = {}
+INTERNAL_RES.x = 256
+INTERNAL_RES.y = 144
+
+local EXTERNAL_RES = {}
+EXTERNAL_RES.x = 640
+EXTERNAL_RES.y = 360
+
+-- Mainmenu
+local mainmenu
 
 function love.load()
-    
-    INTERNAL_RES = {}
-    INTERNAL_RES.x = 256
-    INTERNAL_RES.y = 144
-    
-    EXTERNAL_RES = {}
-    EXTERNAL_RES.x = 640
-    EXTERNAL_RES.y = 360
-    
     love.window.setMode(EXTERNAL_RES.x, EXTERNAL_RES.y)
     love.graphics.setFont(love.graphics.newFont(12))
-    
+
     mainmenu = menuengine.new(20,20)
-    mainmenu:addEntry("Mouse works, as")
-    mainmenu:addEntry("you can see, on")
-    mainmenu:addEntry("scaled Screens too!")
+    mainmenu:addEntry("Mouse works, as", function()end)
+    mainmenu:addEntry("you can see, on", function()end)
+    mainmenu:addEntry("scaled Screens too!", function()end)
 end
 
 function love.update(dt)
@@ -322,14 +336,14 @@ end
 function love.draw()
     -- Scale Resolution
     love.graphics.scale(love.graphics.getWidth() / INTERNAL_RES.x, love.graphics.getHeight() / INTERNAL_RES.y)
-    
+
     love.graphics.clear()
     mainmenu:draw()
 end
 
 function love.keypressed(key, scancode, isrepeat)
     menuengine.keypressed(scancode)
-    
+
     if scancode == "escape" then
         love.event.quit()
     end
