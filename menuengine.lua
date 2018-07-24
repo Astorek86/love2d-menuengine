@@ -70,7 +70,7 @@ function menuengine.new(x, y, font, space)
     self.mouseDisabled = menuengine.settings.mouseDisabled
 
     -- Add Entry
-    function self:addEntry(text, func, font, colorNormal, colorSelected)
+    function self:addEntry(text, func, arg, font, colorNormal, colorSelected)
         if menuengine.stop_on_nil_functions and func == nil and self.target == nil then
             error("menuengine: nil is not a function")
             --[[
@@ -84,6 +84,7 @@ function menuengine.new(x, y, font, space)
             self.entries[#self.entries].y = y + (#self.entries-1) * self.space
             self.entries[#self.entries].font = font or self.font
             self.entries[#self.entries].func = func or function()end
+            self.entries[#self.entries].arg = arg
             self.entries[#self.entries].colorNormal = colorNormal or self.colorNormal
             self.entries[#self.entries].colorSelected = colorSelected or self.colorSelected
 
@@ -255,13 +256,13 @@ function menuengine.new(x, y, font, space)
     -- This function should probably NOT be called from the "outside".
     function self:_finish()
         if not self.entries[self.cursor].disabled then
-            self.entries[self.cursor].func()
+            self.entries[self.cursor].func(self.entries[self.cursor].arg)
             if self.entries[self.cursor].sndSuccess ~= nil then
                 self.entries[self.cursor].sndSuccess:stop()
                 self.entries[self.cursor].sndSuccess:play()
             end
             if self.target ~= nil then
-                self.target(self.cursor)
+                self.target(self.cursor, self.entries[self.cursor].arg)
             end
         end
     end
