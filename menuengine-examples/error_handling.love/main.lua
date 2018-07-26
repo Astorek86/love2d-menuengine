@@ -10,7 +10,7 @@ function love.load()
     love.window.setMode(600,400)
     love.graphics.setFont(love.graphics.newFont(14))
 
-    -- CHANGE ME -- CHANGE ME -- CHANGE ME -- CHANGE ME --
+    -- CHANGE ME to "true" -- CHANGE ME to "true" -- CHANGE ME to "true" -- CHANGE ME to "true" --
     menuengine.stop_on_nil_functions = false
 
     mainmenu = menuengine.new(10,100)

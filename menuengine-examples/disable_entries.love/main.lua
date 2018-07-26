@@ -4,6 +4,7 @@ local menuengine = require "menuengine"
 -- Mainmenu
 local mainmenu
 
+
 -- Entries
 local entry_one, entry_two, entry_four
 
@@ -35,15 +36,18 @@ function love.load()
     love.window.setMode(600,400)
     love.graphics.setFont(love.graphics.newFont(20))
 
-    menuengine.settings.sndMove = love.audio.newSource("pick.wav", "static")
-    menuengine.settings.sndSuccess = love.audio.newSource("accept.wav", "static")
-
+    -- Init Mainmenu
     mainmenu = menuengine.new(200,100)
+    
+    mainmenu:setSndMove(love.audio.newSource("pick.wav", "static"))
+    mainmenu:setSndSuccess(love.audio.newSource("accept.wav", "static"))
+    
     entry_one = mainmenu:addEntry("Hide me", hide_first_entry)
     entry_two = mainmenu:addEntry("Hide me too", hide_second_entry)
     mainmenu:addEntry("Hide Entry below me", hide_fourth_entry)
     entry_four = mainmenu:addEntry("show first Entry if hidden", show_first_entry)
     mainmenu:addEntry("show all Entries if hidden", show_all_entries)
+    
 end
 
 

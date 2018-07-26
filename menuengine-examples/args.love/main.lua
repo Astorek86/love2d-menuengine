@@ -1,5 +1,5 @@
 local menuengine = require "menuengine"
-menuengine.stop_on_nil_functions = true
+
 
 local text = "Nothing was selected."
 
@@ -13,7 +13,7 @@ local function mainmenu_finish(entrypoint)
         text = "Start Game was selected!"
     elseif entrypoint == 2 then
         text = "Options was selected!"
-    elseif entrypoint == 4 then  -- 4, not 3, because of "addSep()"
+    elseif entrypoint == 3 then
         text = "Quit Game was selected!"
     end
 end
@@ -25,11 +25,10 @@ function love.load()
     love.graphics.setFont(love.graphics.newFont(20))
 
     mainmenu = menuengine.new(200,100)
-    mainmenu.target = mainmenu_finish  -- enable Target-Mode.
-    mainmenu:addEntry("Start Game")
-    mainmenu:addEntry("Options")
+    mainmenu:addEntry("Start Game", mainmenu_finish, 1)  -- call "mainmenu_finish", args = "1"
+    mainmenu:addEntry("Options", mainmenu_finish, 2)  -- call "mainmenu_finish", args = "2"
     mainmenu:addSep()
-    mainmenu:addEntry("Quit Game")
+    mainmenu:addEntry("Quit Game", mainmenu_finish, 3)  -- call "mainmenu_finish", args = "3"
 end
 
 

@@ -3,36 +3,36 @@ local menuengine = require "menuengine"
 -- Menus
 local mainmenu, menu_one, menu_two, menu_three
 
--- Mode to see which Menu should be displayed and interact.
-local MODE
 
 -- Functions to change Mode
 local function menu_main()
-    MODE = 0
+    menuengine.disable()  -- Disable every Menu...
+    mainmenu:setDisabled(false)  -- ...but enable Mainmenu.
     mainmenu.cursor = 1  -- reset Selection to the first Entry
 end
 
 local function menu_one()
-    MODE = 1
+    menuengine.disable()  -- Disable every Menu...
+    menu_one:setDisabled(false)  -- ...but enable Firstmenu.
     menu_one.cursor = 1  -- reset Selection to the first Entry
 end
 
 local function menu_two()
+    menuengine.disable()  -- Disable every Menu...
+    menu_two:setDisabled(false)  -- ...but enable Secondmenu.
     MODE = 2
     menu_two.cursor = 1  -- reset Selection to the first Entry
 end
 
 local function menu_three()
-    MODE = 3
+    menuengine.disable()  -- Disable every Menu...
+    menu_three:setDisabled(false)  -- ...but enable Thirdmenu.
     menu_three.cursor = 1  -- reset Selection to the first Entry
 end
 
  -- ----------
 
 function love.load()
-
-    MODE = 0
-
     love.window.setMode(600,400)
     love.graphics.setFont(love.graphics.newFont(20))
 
@@ -62,33 +62,21 @@ function love.load()
     menu_three:addEntry("Entry Two of Sub-Menu Three")
     menu_three:addEntry("Entry Three of Sub-Menu Three")
     menu_three:addEntry("<-- Go back to Mainmenu (3)", menu_main)
+    
+    -- Disable Every Menu, then activate Mainmenu
+    menuengine.disable()
+    mainmenu:setDisabled(false)
 end
 
 
 function love.update(dt)
-    if MODE == 0 then
-        mainmenu:update()
-    elseif MODE == 1 then
-        menu_one:update()
-    elseif MODE == 2 then
-        menu_two:update()
-    elseif MODE == 3 then
-        menu_three:update()
-    end
+    menuengine.update()
 end
 
 
 function love.draw()
     love.graphics.clear()
-    if MODE == 0 then
-        mainmenu:draw()
-    elseif MODE == 1 then
-        menu_one:draw()
-    elseif MODE == 2 then
-        menu_two:draw()
-    elseif MODE == 3 then
-        menu_three:draw()
-    end
+    menuengine.draw()
 end
 
 

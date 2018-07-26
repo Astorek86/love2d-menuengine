@@ -12,7 +12,7 @@ function love.load()
 
     local i
     for i=20,10,-1 do
-        mainmenu:addEntry("Font-Size: "..i, function()end,love.graphics.newFont(i))
+        mainmenu:addEntry("Font-Size: "..i, nil, nil, love.graphics.newFont(i))
     end
 end
 

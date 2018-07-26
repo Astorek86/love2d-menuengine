@@ -18,9 +18,9 @@ function love.load()
     love.graphics.setFont(love.graphics.newFont(12))
 
     mainmenu = menuengine.new(20,20)
-    mainmenu:addEntry("Mouse works, as", function()end)
-    mainmenu:addEntry("you can see, on", function()end)
-    mainmenu:addEntry("scaled Screens too!", function()end)
+    mainmenu:addEntry("Mouse works, as")
+    mainmenu:addEntry("you can see, on")
+    mainmenu:addEntry("scaled Screens too!")
 end
 
 

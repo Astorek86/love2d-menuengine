@@ -1,11 +1,12 @@
 local menuengine = {}
-menuengine.VERSION = "0.9.9d Beta"
+menuengine.VERSION = "0.9.9e Beta"
 
 
 -- Defaults
 menuengine.settings = {
     disabled = false,
-    target = nil,
+    target = nil,  -- WARNING: Deprecrated
+    args = nil,
     colorSelected = {.8,.4,.4},
     colorNormal = {1, 1, 1},
     symbolSelectedBegin = "[ ",
@@ -42,8 +43,9 @@ menuengine.mouse_y = 0
 menuengine.clicked = false
 
 
--- Error-Handling if nil-Function is there
+-- Error-Handling if nil-Function is there. WARNING: On future Releases, This Setting will be set to "true".
 menuengine.stop_on_nil_functions = false
+
 
 
 -- Constructor
@@ -58,7 +60,7 @@ function menuengine.new(x, y, font, space)
 
     -- Setting up Defaults. TODO: There must be a better way to do this...
     self.disabled = menuengine.settings.disabled
-    self.target = menuengine.settings.target  -- Special Snowflake here...
+    self.target = menuengine.settings.target  -- WARNING: Deprecated
     self.colorSelected = menuengine.settings.colorSelected
     self.colorNormal = menuengine.settings.colorNormal
     self.symbolSelectedBegin = menuengine.settings.symbolSelectedBegin
@@ -68,15 +70,12 @@ function menuengine.new(x, y, font, space)
     self.sndMove = menuengine.settings.sndMove
     self.sndSuccess = menuengine.settings.sndSuccess
     self.mouseDisabled = menuengine.settings.mouseDisabled
+    self.args = menuengine.settings.args
 
     -- Add Entry
-    function self:addEntry(text, func, font, colorNormal, colorSelected)
-        if menuengine.stop_on_nil_functions and func == nil and self.target == nil then
+    function self:addEntry(text, func, args, font, colorNormal, colorSelected)
+        if menuengine.stop_on_nil_functions and func == nil and self.target == nil then  -- WARNING: "target" Deprecrated
             error("menuengine: nil is not a function")
-            --[[
-                Maybe a Typo-Error? I think it's more useful to throw an
-                Error and NOT continuing, like, there's nothing wrong about that...
-            --]]
         else
             self.entries[#self.entries+1] = {}
             self.entries[#self.entries].text = text
@@ -84,6 +83,7 @@ function menuengine.new(x, y, font, space)
             self.entries[#self.entries].y = y + (#self.entries-1) * self.space
             self.entries[#self.entries].font = font or self.font
             self.entries[#self.entries].func = func or function()end
+            self.entries[#self.entries].args = args or self.args
             self.entries[#self.entries].colorNormal = colorNormal or self.colorNormal
             self.entries[#self.entries].colorSelected = colorSelected or self.colorSelected
 
@@ -157,6 +157,14 @@ function menuengine.new(x, y, font, space)
     function self:addSep()
         return self:addEntry("", function()end)
     end
+    
+    -- Set Default args
+    function self:setArgs(args)
+        local i
+        for i=1,#self.entries do
+            self.entries[i].args = args
+        end
+    end
 
     -- Disable this Menu; "draw" and "update" will have no effects.
     function self:setDisabled(value)
@@ -228,6 +236,7 @@ function menuengine.new(x, y, font, space)
             if not self.mouseDisabled then
 
                 for i=1,#self.entries do
+                    -- React on Cursor-Position, which needs to collect the Length of every Text-Elements like "normalSelectedBegin", "normalSelectedEnd" etc... TODO: Better readable, please?^^
                     if not self.entries[i].disabled and menuengine.mouse_y > self.entries[i].y and menuengine.mouse_y < self.entries[i].y + self.space and #self.entries[i].text > 0 and
                       menuengine.mouse_x > self.entries[i].x and menuengine.mouse_x < self.entries[i].x + self.entries[i].font:getWidth(self.entries[i].text..self.normalSelectedBegin..self.normalSelectedEnd..self.symbolSelectedEnd) then
                         if self.cursor ~= i then
@@ -240,7 +249,7 @@ function menuengine.new(x, y, font, space)
                         if not self.entries[i].disabled and love.mouse.isDown(1) and not menuengine.clicked then
                             self:_finish()
                             menuengine.clicked = true
-                        -- prevent Clicking by every Frame
+                        -- prevents Clicking every Frame
                         elseif not love.mouse.isDown(1) then
                             menuengine.clicked = false
                         end
@@ -255,13 +264,14 @@ function menuengine.new(x, y, font, space)
     -- This function should probably NOT be called from the "outside".
     function self:_finish()
         if not self.entries[self.cursor].disabled then
-            self.entries[self.cursor].func()
+            self.entries[self.cursor].func(self.entries[self.cursor].args)
             if self.entries[self.cursor].sndSuccess ~= nil then
                 self.entries[self.cursor].sndSuccess:stop()
                 self.entries[self.cursor].sndSuccess:play()
             end
+              -- WARNING: Deprecrated
             if self.target ~= nil then
-                self.target(self.cursor)
+                self.target(self.cursor, self.entries[self.cursor].args)
             end
         end
     end
@@ -309,13 +319,28 @@ function menuengine.mousemoved(x, y)
 end
 
 
--- TODO: Everything after that is not documented yet, I don't know if they are necessary. Maybe they will be removed...
+-- Draw every Menu
+function menuengine.draw()
+    local i
+    for i=1,#menus do
+        menus[i]:draw()
+    end
+end
+
+-- Updates every Menu
+function menuengine.update()
+    local i
+    for i=1,#menus do
+        menus[i]:update()
+    end
+end
+
 
 -- Disable EVERY Menu
 function menuengine.disable()
     local i
     for i=1,#menus do
-        menus[i]:disable()
+        menus[i]:setDisabled(true)
     end
 end
 
@@ -324,9 +349,11 @@ end
 function menuengine.enable()
     local i
     for i=1,#menus do
-        menus[i]:enable()
+        menus[i]:setDisabled(false)
     end
 end
+
+-- TODO: Everything after that is not documented yet, I don't know if they are necessary. Maybe they will be removed...
 
 
 -- Set Font for EVERY Menu
@@ -372,6 +399,5 @@ function menuengine.mouseDisable()
         menus[i]:mouseDisable()
     end
 end
-
 
 return menuengine

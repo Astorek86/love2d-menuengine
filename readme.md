@@ -19,25 +19,30 @@ X-Position. Optional but recommended.
 Y-Position. Optional but recommended.
 
 `font (love.graphics.getFont())`
-Font. If not Font is configured, it will use the current Default-Font. Optional.
+Font. If no Font is configured, it will use the current Default-Font. Optional.
 
-`space (self.font:getHeight())`
+`space (love.graphics.getFont():getHeight())`
 Spaces between Entries. Usually, it should be autodetected by the Font you are using, but sometimes it might be better to set this explicitly. Optional.
 ___
 ## Add Entries
 You can add Entries through the `menu`-Object:
 ```Lua
-entry = menu:addEntry(text, [func], [font], [colorNormal], [colorSelected])
+entry = menu:addEntry(text, [func], [args], [font], [colorNormal], [colorSelected])
 ```
 Returns an **entry**-object (see below).
 
 `text`
 Displayed Text. Required.
 
-`func`
-Function that will be called, if the User selects this Menupoint. If set to **nil**, nothing will happend (except you set the menu:__target__ to a function (see below, "Example 2")). Optional.
+`func (nil)`
+Function that will be called, if the User selects this Menupoint.
 
 > If you set `menuengine.stop_on_nil_functions = true`, a **nil**-Function will throw an Error.
+> **Note:** On future Releases, a *nil*-`func` will automatically throw an Error and `menuengine.stop_on_nil_functions` will be removed!
+
+`args`
+(New in 0.9.9e Beta)
+If User selects this Menupoint, it will call the given `func` with that given Arguments.
 
 `font`
 Selected Font-Object for this Entry. Optional.
@@ -69,6 +74,9 @@ Font as Font-Object. Default-Font if not configured.
 
 `func`
 function as callable Function. **nil** if not configured.
+
+`args`
+Arguments that will pass through the function. **nil** if not configured.
 
 `symbolSelectedBegin`, `symbolSelectedEnd`, `normalSelectedBegin`, `normalSelectedEnd`
 Strings to add on Begin/End of the Text ("symbol..." if selected, "normal..." if not selected).
@@ -180,6 +188,19 @@ Integer. Represent actual Cursor-Position.
 > Be very careful of setting this Variable. It is useful for setting the Cursor in a Pre-defined Value (for example, **1** is always the first Entry), but it will not check on Errors! As say, be very careful with that Attribute!
 
 ___
+## Other Functions
+`menuengine.draw()`
+Will draw EVERY Menu (if not disabled)
+
+`menuengine.update()`
+Will update EVERY Menu (if not disabled)
+
+`menuengine.disable()`
+Disables EVERY Menu.
+
+`menuengine.enable()`
+Enables EVERY Menu.
+___
 # Examples
 ___
 ## Example 1
@@ -244,7 +265,7 @@ end
 ```
 ___
 ### Example 2
-Example with **target**-Usage.
+Example with **args**-Usage.
 ```Lua
 local menuengine = require "menuengine"
 menuengine.stop_on_nil_functions = true
@@ -260,7 +281,7 @@ local function mainmenu_finish(entrypoint)
         text = "Start Game was selected!"
     elseif entrypoint == 2 then
         text = "Options was selected!"
-    elseif entrypoint == 4 then  -- 4, not 3, because of "addSep()"
+    elseif entrypoint == 3 then
         text = "Quit Game was selected!"
     end
 end
@@ -272,11 +293,10 @@ function love.load()
     love.graphics.setFont(love.graphics.newFont(20))
 
     mainmenu = menuengine.new(200,100)
-    mainmenu.target = mainmenu_finish  -- enable Target-Mode.
-    mainmenu:addEntry("Start Game")
-    mainmenu:addEntry("Options")
+    mainmenu:addEntry("Start Game", mainmenu_finish, 1)  -- call "mainmenu_finish", args = "1"
+    mainmenu:addEntry("Options", mainmenu_finish, 2)  -- call "mainmenu_finish", args = "2"
     mainmenu:addSep()
-    mainmenu:addEntry("Quit Game")
+    mainmenu:addEntry("Quit Game", mainmenu_finish, 3)  -- call "mainmenu_finish", args = "3"
 end
 
 function love.update(dt)
@@ -324,9 +344,11 @@ function love.load()
     love.graphics.setFont(love.graphics.newFont(12))
 
     mainmenu = menuengine.new(20,20)
-    mainmenu:addEntry("Mouse works, as", function()end)
-    mainmenu:addEntry("you can see, on", function()end)
-    mainmenu:addEntry("scaled Screens too!", function()end)
+    mainmenu:addEntry("Mouse works, as")
+    mainmenu:addEntry("you can see, on")
+    mainmenu:addEntry("scaled Screens too!")
+	-- Of course, nothing will happen if you selected an Entry because of
+	-- no 'func'-Parameter; it's just a "Mouse works in scaled Res"-Showcase^^
 end
 
 function love.update(dt)
