@@ -1,5 +1,5 @@
 local menuengine = {}
-menuengine.VERSION = "0.9.9e Beta"
+menuengine.VERSION = "0.9.9e Beta @jroo fork"
 
 
 -- Defaults
@@ -16,6 +16,8 @@ menuengine.settings = {
     sndMove = nil,
     sndSuccess = nil,
     mouseDisabled = false,
+    limit = nil, 
+    align = nil
 }
 
 
@@ -49,7 +51,7 @@ menuengine.stop_on_nil_functions = false
 
 
 -- Constructor
-function menuengine.new(x, y, font, space)
+function menuengine.new(x, y, font, space, align, limit)
     local self = {}
 
     -- These four Variables should probably NOT be edited from the "outside".
@@ -57,6 +59,8 @@ function menuengine.new(x, y, font, space)
     self.cursor = 1
     self.x = x or 0
     self.y = y or 0
+    self.limit = limit or love.graphics.getWidth()
+    self.align = align or "left"
 
     -- Setting up Defaults. TODO: There must be a better way to do this...
     self.disabled = menuengine.settings.disabled
@@ -141,10 +145,10 @@ function menuengine.new(x, y, font, space)
                 love.graphics.setFont(self.entries[i].font)
                 if self.cursor == i and #self.entries[i].text > 0 then
                     love.graphics.setColor(self.entries[i].colorSelected)
-                    love.graphics.print(self.entries[i].symbolSelectedBegin..self.entries[i].text..self.entries[i].symbolSelectedEnd,self.entries[i].x,self.entries[i].y)
+                    love.graphics.printf(self.entries[i].symbolSelectedBegin..self.entries[i].text..self.entries[i].symbolSelectedEnd,self.entries[i].x,self.entries[i].y, self.limit, self.align)
                 else
                     love.graphics.setColor(self.entries[i].colorNormal)
-                    love.graphics.print(self.entries[i].normalSelectedBegin..self.entries[i].text..self.entries[i].normalSelectedEnd,self.entries[i].x,self.entries[i].y)
+                    love.graphics.printf(self.entries[i].normalSelectedBegin..self.entries[i].text..self.entries[i].normalSelectedEnd,self.entries[i].x,self.entries[i].y, self.limit, self.align)
                 end
             end
         end
