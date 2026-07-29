@@ -8,7 +8,7 @@ For a quick view, scroll down to see the Examples. It is - in my opinion - reall
 
 ## Constructor
 ```Lua
-menu = menuengine.new([x], [y], [font], [space])
+menu = menuengine.new([x], [y], [font], [space], [align], [limit])
 ```
 Returns an **menu**-object (see below).
 
@@ -23,6 +23,13 @@ Font. If no Font is configured, it will use the current Default-Font. Optional.
 
 `space (love.graphics.getFont():getHeight())`
 Spaces between Entries. Usually, it should be autodetected by the Font you are using, but sometimes it might be better to set this explicitly. Optional.
+
+`align ("left")`
+Alignment of text. `"left"`, `"center"` or `"right"`
+
+`limit (love.graphics.getWidth())`
+Wrap the line after this many horizontal pixels. Alignment is based on this value.
+
 ___
 ## Add Entries
 You can add Entries through the `menu`-Object:
